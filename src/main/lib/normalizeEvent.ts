@@ -4,6 +4,7 @@
 
 import type { City, KidEvent, Price, Tag } from '@shared/types';
 import { deriveIndoor, deriveTags } from './tags.js';
+import { parseAgeRange, bucketsForRange } from './ageBuckets.js';
 
 /**
  * Small, stable, dependency-free string hash (so this module runs in both Node
@@ -59,17 +60,10 @@ function derivePrice(priceText: string | null | undefined, isFree: boolean | nul
 }
 
 function ageTags(ageRange: string | null | undefined): Tag[] {
-  if (!ageRange) return [];
-  const nums = ageRange.match(/\d{1,2}/g)?.map(Number) ?? [];
-  if (!nums.length) return [];
-  const min = Math.min(...nums);
-  const max = Math.max(...nums);
-  const tags: Tag[] = [];
-  if (min <= 1) tags.push('baby');
-  if (min <= 3) tags.push('toddler');
-  if (min <= 6) tags.push('preschool');
-  if (max >= 7) tags.push('school-age');
-  return tags;
+  const range = parseAgeRange(ageRange);
+  if (!range) return [];
+  // Age buckets (baby/toddler/preschool/school-age) are all valid Tag values.
+  return bucketsForRange(range.min, range.max) as Tag[];
 }
 
 /** Normalize whitespace and strip HTML tags from a description blob. */

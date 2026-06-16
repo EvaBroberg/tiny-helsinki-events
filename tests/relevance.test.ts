@@ -74,6 +74,22 @@ describe('ageBucketsForEvent', () => {
     expect(buckets).toContain('toddler');
   });
 
+  it('does not put a baby-only (0–1) event in the preschool bucket', () => {
+    const ev = normalizeEvent({
+      title: 'Baby morning',
+      description: 'vauvoille',
+      ageRange: '–1 v',
+      startDate: '2026-06-17',
+      city: 'Helsinki',
+      sourceName: 'X',
+      sourceUrl: 'https://x',
+      eventUrl: 'https://x/e',
+    });
+    const buckets = ageBucketsForEvent(ev);
+    expect(buckets).toContain('baby');
+    expect(buckets).not.toContain('preschool');
+  });
+
   it('defaults to family when nothing else is known', () => {
     const ev = normalizeEvent({
       title: 'Perhetapahtuma',

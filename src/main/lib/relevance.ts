@@ -1,6 +1,7 @@
 // Decide whether an event is relevant for children / families.
 
 import type { KidEvent, AgeBucket } from '@shared/types';
+import { parseAgeRange, bucketsForRange } from './ageBuckets.js';
 
 /** Relevance keywords (Finnish + English) per the product spec. */
 export const RELEVANCE_KEYWORDS = [
@@ -97,18 +98,9 @@ export function ageBucketsForEvent(event: KidEvent): AgeBucket[] {
     if (t === 'school-age') buckets.add('school-age');
     if (t === 'family' || t === 'kids') buckets.add('family');
   }
-  // Parse a numeric age range like "0-3", "3–6 v", "7+".
-  if (event.ageRange) {
-    const nums = event.ageRange.match(/\d{1,2}/g)?.map(Number) ?? [];
-    const min = nums.length ? Math.min(...nums) : null;
-    const max = nums.length > 1 ? Math.max(...nums) : null;
-    if (min !== null) {
-      if (min <= 1 || (max !== null && max <= 1)) buckets.add('baby');
-      if (min <= 3) buckets.add('toddler');
-      if (min <= 6) buckets.add('preschool');
-      if ((max ?? min) >= 7) buckets.add('school-age');
-    }
-  }
+  // Add buckets that actually overlap the numeric age range.
+  const range = parseAgeRange(event.ageRange);
+  if (range) bucketsForRange(range.min, range.max).forEach((b) => buckets.add(b));
   if (buckets.size === 0) buckets.add('family');
   return [...buckets];
 }
