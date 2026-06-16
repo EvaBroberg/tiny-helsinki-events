@@ -45,20 +45,46 @@ const SIGNALS: TagSignal[] = [
 ];
 
 const OUTDOOR_PATTERNS = [
-  /\bulko/i,
+  /\bulko/i, // ulkoilu, ulkona
   /\boutdoor/i,
-  /\bpuisto/i,
+  /puisto/i, // puisto, leikkipuisto, kaupunginpuisto
   /\bpark\b/i,
-  /\bmetsä/i,
+  /metsä/i,
   /\bforest/i,
   /\bpiha\b/i,
-  /\branta/i,
+  /ranta/i, // ranta, uimaranta
   /\bbeach/i,
-  /\bluonto/i,
+  /luonto/i,
   /\bnature/i,
+  /kenttä/i, // kenttä, leikkikenttä, urheilukenttä
+  /\bfield\b/i,
+  /\btori\b/i, // market square
+  /stadion/i,
+  /\bgarden\b/i,
+  /puutarha/i,
 ];
 
-const INDOOR_PATTERNS = [/\bsisä/i, /\bindoor/i, /\bmuseo/i, /\bmuseum/i, /\bkirjasto/i, /\blibrary/i];
+const INDOOR_PATTERNS = [
+  /\bsisä/i,
+  /\bindoor/i,
+  /museo/i,
+  /\bmuseum/i,
+  /kirjasto/i,
+  /\blibrar/i,
+  /bibliotek/i,
+  /talo\b/i, // Annantalo, kulttuuritalo, kaupungintalo
+  /sali\b/i, // juhlasali, liikuntasali
+  /keskus/i, // kulttuurikeskus, kauppakeskus
+  /halli\b/i, // urheiluhalli, jäähalli
+  /teatteri/i,
+  /\btheatre\b/i,
+  /\btheater\b/i,
+  /galleria/i,
+  /\bgallery\b/i,
+  /kino/i,
+  /elokuva/i,
+  /\bcinema\b/i,
+];
 
 const KIDS_PATTERNS = [/\blapset/i, /\blapsille/i, /\bkids?\b/i, /\bchildren/i, /\blasten/i];
 

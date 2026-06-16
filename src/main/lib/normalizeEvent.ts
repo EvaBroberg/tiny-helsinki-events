@@ -105,7 +105,9 @@ export function normalizeEvent(input: NormalizeInput): KidEvent {
   const price = derivePrice(input.priceText, input.isFree);
   if (price === 'free') tags.add('free');
 
-  const indoor = deriveIndoor(haystack);
+  // Indoor/outdoor is best inferred from the VENUE, so include the location.
+  const settingText = `${haystack} ${input.location ?? ''}`;
+  const indoor = deriveIndoor(settingText);
   if (indoor === false) tags.add('outdoor');
   else if (indoor === true) tags.add('indoor');
 
