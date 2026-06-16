@@ -10,6 +10,7 @@
 
 import type { City, KidEvent } from '@shared/types';
 import { normalizeEvent, type NormalizeInput } from '../lib/normalizeEvent.js';
+import { isDesignedForKids } from '../lib/relevance.js';
 import { isoToHelsinkiDate, isoToHelsinkiTime } from '../lib/dateParser.js';
 import { addDays } from '../lib/eventWindow.js';
 import type { Scraper, ScrapeContext } from './types.js';
@@ -123,12 +124,6 @@ export function linkedEventToInput(
   if (!title) return null;
   if (!raw.start_time) return null;
 
-  // The broad "families" audience keyword also catches adult/senior events
-  // (peer-support groups, adult reading circles…). Drop anything whose minimum
-  // audience age is past childhood — a kids/family app shouldn't list a 60+ or
-  // 16+ event.
-  if (typeof raw.audience_min_age === 'number' && raw.audience_min_age >= 13) return null;
-
   const startDate = isoToHelsinkiDate(raw.start_time);
   if (!startDate) return null;
   let startTime = isoToHelsinkiTime(raw.start_time);
@@ -165,6 +160,18 @@ export function linkedEventToInput(
   else if (description && descPick.lang !== 'en') lang = descPick.lang;
 
   const eventUrl = pickDisplay(raw.info_url).text || `https://linkedevents.hel.fi/fi/event/${raw.id}`;
+
+  // Require a positive "designed for kids" signal — the family audience alone
+  // sweeps in adult/senior activities that merely allow all ages (0–100).
+  if (
+    !isDesignedForKids({
+      text: `${title} ${description} ${keywordsText} ${location ?? ''}`,
+      minAge: raw.audience_min_age,
+      maxAge: raw.audience_max_age,
+    })
+  ) {
+    return null;
+  }
 
   return {
     title,

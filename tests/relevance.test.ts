@@ -1,6 +1,31 @@
 import { describe, it, expect } from 'vitest';
-import { isRelevantForKids, eventIsRelevant, ageBucketsForEvent } from '../src/main/lib/relevance.js';
+import {
+  isRelevantForKids,
+  eventIsRelevant,
+  ageBucketsForEvent,
+  isDesignedForKids,
+} from '../src/main/lib/relevance.js';
 import { normalizeEvent } from '../src/main/lib/normalizeEvent.js';
+
+describe('isDesignedForKids', () => {
+  it('keeps events with a specific child age range', () => {
+    expect(isDesignedForKids({ text: 'Avoimet ovet', maxAge: 6 })).toBe(true);
+  });
+  it('keeps events with kid/family keywords', () => {
+    expect(isDesignedForKids({ text: 'Satutuokio lapsille', maxAge: null })).toBe(true);
+    expect(isDesignedForKids({ text: 'Vauvojen lorutuokio', maxAge: 100 })).toBe(true);
+  });
+  it('drops generic all-ages adult activities with no kid signal', () => {
+    expect(isDesignedForKids({ text: 'Syvänveden jumppa maauimalassa', minAge: 0, maxAge: 100 })).toBe(false);
+    expect(isDesignedForKids({ text: 'Omatoiminen ompelu, Töölön seniorikeskus', maxAge: 100 })).toBe(false);
+  });
+  it('drops adult-min-age events', () => {
+    expect(isDesignedForKids({ text: 'Lukupiiri', minAge: 16, maxAge: 100 })).toBe(false);
+  });
+  it('keeps a family event even if an adult word appears alongside a kid word', () => {
+    expect(isDesignedForKids({ text: 'Perheiden vesijumppa', maxAge: null })).toBe(true);
+  });
+});
 
 describe('isRelevantForKids', () => {
   it('keeps events with kids/family keywords (Finnish)', () => {

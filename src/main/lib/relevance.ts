@@ -79,6 +79,102 @@ export function isRelevantForKids(input: RelevanceInput): boolean {
   return KEYWORD_REGEXPS.some((re) => re.test(text));
 }
 
+// Strong "this is actually for children" signals (Finnish + English + Swedish),
+// matched as lowercase substrings against title + description + keywords + venue.
+const KID_MARKERS = [
+  'lapsi',
+  'lapset',
+  'lapsille',
+  'lasten',
+  'lastenkulttuuri',
+  'lastentapahtum',
+  'vauv', // vauva, vauvat, vauvoille, vauvojen
+  'taaper',
+  'perhe', // perhe, perheen, perheet, perheille, koko perhe
+  'satu', // satutunti, satutuokio
+  'loru', // lorutuokio (rhyme time)
+  'nukke', // nukketeatteri
+  'leikki', // leikki, leikkipuisto, Museo Leikki
+  'muskari',
+  'eskari',
+  'esikoul',
+  'koululais',
+  'alakoul',
+  'päiväkoti',
+  'varhaiskasvatus',
+  'sirkuskoulu',
+  'muksu',
+  'nappula',
+  'penska',
+  'barn', // sv: children
+  'famili', // sv: familj / en: family/families
+  'kids',
+  'children',
+  'family',
+  'toddler',
+  'baby',
+  'babies',
+  'stroller',
+];
+
+// Markers of adult/senior-oriented activities that the broad "families" audience
+// keyword sometimes sweeps in. Excluded unless a kid marker is also present.
+const ADULT_MARKERS = [
+  'seniori',
+  'seniorikeskus',
+  'ikääntyn',
+  'ikäihmis',
+  'eläkeläis',
+  'eläkeikä',
+  'varttuneet',
+  'varttunut',
+  'aikuisten',
+  'aikuisille',
+  'työikäis',
+  'työnhaku',
+  'työllisty',
+  'omaishoita',
+  'muistisair',
+  'muistikahvila',
+  'palvelukeskus',
+  'kuntosali',
+  'vesijumppa',
+  'vesijuoksu',
+  'vesivoimistelu',
+  'jumppa',
+  'kahvakuula',
+];
+
+/**
+ * Stricter "is this actually DESIGNED for kids" test for events that arrive via
+ * the broad child/family AUDIENCE filter. Age alone isn't enough — a "0–100"
+ * adult activity isn't a kids event. Keep only when there is a positive kid
+ * signal (specific child age range OR kid/family keywords) and no overriding
+ * adult/senior signal.
+ */
+export function isDesignedForKids(input: {
+  text: string;
+  minAge?: number | null;
+  maxAge?: number | null;
+}): boolean {
+  const t = (input.text ?? '').toLowerCase();
+  const minAge = input.minAge ?? null;
+  const maxAge = input.maxAge ?? null;
+
+  // Explicitly not for children.
+  if (minAge !== null && minAge >= 13) return false;
+
+  const hasKid = KID_MARKERS.some((m) => t.includes(m));
+  const hasAdult = ADULT_MARKERS.some((m) => t.includes(m));
+
+  if (hasAdult && !hasKid) return false;
+  // A specific upper age bound within childhood is a strong "for kids" signal.
+  if (maxAge !== null && maxAge <= 12) return true;
+  if (hasKid) return true;
+  // Generic all-ages event with no kid signal → not designed for kids.
+  return false;
+}
+
 /** Convenience wrapper for a fully-built KidEvent. */
 export function eventIsRelevant(event: KidEvent): boolean {
   const text = `${event.title} ${event.description} ${event.tags.join(' ')}`;
