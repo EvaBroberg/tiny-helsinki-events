@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { AgeBucket, EventFilters, Price } from '@shared/types';
 import { CITIES } from '@shared/types';
 
@@ -11,97 +11,113 @@ interface Props {
   onChange: (next: EventFilters) => void;
 }
 
-/** Toggle a value in/out of an array (used by every filter group). */
 function toggle<T>(arr: T[], value: T): T[] {
   return arr.includes(value) ? arr.filter((x) => x !== value) : [...arr, value];
+}
+
+function cap(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+interface DropdownProps<T extends string> {
+  label: string;
+  items: readonly T[];
+  selected: T[];
+  onToggle: (value: T) => void;
+}
+
+function Dropdown<T extends string>({ label, items, selected, onToggle }: DropdownProps<T>) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDocClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onEsc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', onDocClick);
+    document.addEventListener('keydown', onEsc);
+    return () => {
+      document.removeEventListener('mousedown', onDocClick);
+      document.removeEventListener('keydown', onEsc);
+    };
+  }, [open]);
+
+  const count = selected.length;
+
+  return (
+    <div className="dd" ref={ref}>
+      <button
+        className={`dd-btn ${count ? 'active' : ''}`}
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+      >
+        {label}
+        {count > 0 && <span className="dd-badge">{count}</span>}
+        <span className="dd-caret">▾</span>
+      </button>
+      {open && (
+        <div className="dd-panel">
+          {items.map((it) => (
+            <label key={it} className={`dd-item ${selected.includes(it) ? 'sel' : ''}`}>
+              <input
+                type="checkbox"
+                checked={selected.includes(it)}
+                onChange={() => onToggle(it)}
+              />
+              <span>{cap(it)}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function Filters({ filters, onChange }: Props): React.JSX.Element {
   const activeCount =
     filters.cities.length + filters.ages.length + filters.prices.length + filters.settings.length;
 
-  const clearAll = () =>
-    onChange({ cities: [], ages: [], prices: [], settings: [] });
-
   return (
-    <details className="filters-section" open>
-      <summary className="filters-summary">
-        <span>🔍 Filters</span>
-        {activeCount > 0 ? (
-          <span className="filters-count">{activeCount} active</span>
-        ) : (
-          <span className="filters-hint">showing everything</span>
-        )}
-      </summary>
+    <div className="filter-bar">
+      <span className="filter-bar-label">Filter</span>
 
-      <div className="filters">
-        <div className="filter-group">
-          <h4>City</h4>
-          <div className="chips">
-            {CITIES.map((c) => (
-              <button
-                key={c}
-                className={`chip ${filters.cities.includes(c) ? 'on' : ''}`}
-                onClick={() => onChange({ ...filters, cities: toggle(filters.cities, c) })}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
+      <Dropdown
+        label="City"
+        items={CITIES}
+        selected={filters.cities}
+        onToggle={(c) => onChange({ ...filters, cities: toggle(filters.cities, c) })}
+      />
+      <Dropdown
+        label="Age"
+        items={AGES}
+        selected={filters.ages}
+        onToggle={(a) => onChange({ ...filters, ages: toggle(filters.ages, a) })}
+      />
+      <Dropdown
+        label="Price"
+        items={PRICES}
+        selected={filters.prices}
+        onToggle={(p) => onChange({ ...filters, prices: toggle(filters.prices, p) })}
+      />
+      <Dropdown
+        label="Setting"
+        items={SETTINGS}
+        selected={filters.settings}
+        onToggle={(s) => onChange({ ...filters, settings: toggle(filters.settings, s) })}
+      />
 
-        <div className="filter-group">
-          <h4>Age</h4>
-          <div className="chips">
-            {AGES.map((a) => (
-              <button
-                key={a}
-                className={`chip ${filters.ages.includes(a) ? 'on' : ''}`}
-                onClick={() => onChange({ ...filters, ages: toggle(filters.ages, a) })}
-              >
-                {a}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="filter-group">
-          <h4>Price</h4>
-          <div className="chips">
-            {PRICES.map((p) => (
-              <button
-                key={p}
-                className={`chip ${filters.prices.includes(p) ? 'on' : ''}`}
-                onClick={() => onChange({ ...filters, prices: toggle(filters.prices, p) })}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="filter-group">
-          <h4>Setting</h4>
-          <div className="chips">
-            {SETTINGS.map((s) => (
-              <button
-                key={s}
-                className={`chip ${filters.settings.includes(s) ? 'on' : ''}`}
-                onClick={() => onChange({ ...filters, settings: toggle(filters.settings, s) })}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="filter-group filter-actions">
-          <h4>&nbsp;</h4>
-          <button className="clear-btn" onClick={clearAll} disabled={activeCount === 0}>
-            ✕ Clear filters
-          </button>
-        </div>
-      </div>
-    </details>
+      {activeCount > 0 ? (
+        <button
+          className="filter-clear"
+          onClick={() => onChange({ cities: [], ages: [], prices: [], settings: [] })}
+        >
+          ✕ Clear ({activeCount})
+        </button>
+      ) : (
+        <span className="filter-bar-hint">Showing everything</span>
+      )}
+    </div>
   );
 }

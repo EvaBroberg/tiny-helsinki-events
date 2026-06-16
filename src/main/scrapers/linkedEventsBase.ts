@@ -67,19 +67,18 @@ function pickLang(s: LangString | string | undefined | null): string {
 }
 
 /**
- * Pick the best display string preferring ENGLISH (so English-speaking users can
- * read events), falling back to Finnish then Swedish. Also reports which
- * language was actually used, so the UI knows whether to offer translation.
+ * Pick the best display string in the event's ORIGINAL language (Finnish first,
+ * then Swedish, then English). We intentionally do NOT pre-translate — the page
+ * is served in its source language so the browser can offer its native
+ * "Translate this page?" experience. Also reports the language used.
  */
 function pickDisplay(
   ...sources: (LangString | undefined)[]
 ): { text: string; lang: 'fi' | 'en' | 'sv' } {
-  for (const order of [['en', 'fi', 'sv'] as const]) {
-    for (const lang of order) {
-      for (const s of sources) {
-        const v = s?.[lang];
-        if (v && v.trim()) return { text: v, lang };
-      }
+  for (const lang of ['fi', 'sv', 'en'] as const) {
+    for (const s of sources) {
+      const v = s?.[lang];
+      if (v && v.trim()) return { text: v, lang };
     }
   }
   return { text: '', lang: 'fi' };

@@ -15,13 +15,13 @@ const fixture = JSON.parse(
 const opts = { fallbackCity: 'Helsinki' as const, sourceName: 'Helsinki (test)' };
 
 describe('linkedEventToInput (Linked Events fixture)', () => {
-  it('transforms a complete event correctly, preferring English text', () => {
+  it('transforms a complete event correctly, in its original language', () => {
     const input = linkedEventToInput(fixture.data[0], opts);
     expect(input).not.toBeNull();
     const ev = normalizeEvent(input!);
 
-    expect(ev.title).toBe('Storytime at Oodi'); // English preferred over Finnish name
-    expect(ev.lang).toBe('en'); // title + description both English -> no translation needed
+    expect(ev.title).toBe('Satutuokio Oodissa'); // original Finnish kept (browser translates)
+    expect(ev.lang).toBe('fi');
     expect(ev.startDate).toBe('2026-06-17');
     expect(ev.startTime).toBe('10:00'); // 07:00Z -> 10:00 Helsinki summer time
     expect(ev.city).toBe('Helsinki');
