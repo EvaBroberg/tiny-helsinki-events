@@ -68,6 +68,9 @@ export function App(): React.JSX.Element {
 
   const visible = byTab[tab];
   const hasCache = data.events.length > 0;
+  const activeFilterCount =
+    filters.cities.length + filters.ages.length + filters.prices.length + filters.settings.length;
+  const otherTabsWithMatches = TABS.filter((t) => t.key !== tab && byTab[t.key].length > 0);
 
   return (
     <div className="app">
@@ -116,11 +119,31 @@ export function App(): React.JSX.Element {
       ) : (
         <div className="empty">
           <div className="big">{loading && !hasCache ? '🔄' : '🦋'}</div>
-          <p>
-            {loading && !hasCache
-              ? 'Looking for lovely little events… (first load fetches live, ~15s)'
-              : 'No events match here yet. Try another tab, loosen the filters, or hit Refresh.'}
-          </p>
+          {loading && !hasCache ? (
+            <p>Looking for lovely little events… (first load fetches live, ~15s)</p>
+          ) : activeFilterCount > 0 ? (
+            <>
+              <p>
+                No events match your filters in{' '}
+                <strong>{TABS.find((t) => t.key === tab)?.label}</strong>.
+              </p>
+              {otherTabsWithMatches.length > 0 && (
+                <p className="empty-hints">
+                  But there’s{' '}
+                  {otherTabsWithMatches.map((t) => (
+                    <button key={t.key} className="empty-hint" onClick={() => setTab(t.key)}>
+                      {byTab[t.key].length} in {t.label.toLowerCase()}
+                    </button>
+                  ))}
+                </p>
+              )}
+              <button className="btn btn-primary" onClick={() => setFilters(DEFAULT_FILTERS)}>
+                ✕ Clear filters
+              </button>
+            </>
+          ) : (
+            <p>No events here right now — try another tab or hit Refresh.</p>
+          )}
         </div>
       )}
 

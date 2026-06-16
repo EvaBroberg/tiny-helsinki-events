@@ -239,6 +239,67 @@ body {
 .filter-clear:hover {
   text-decoration: underline;
 }
+.filters-wrap {
+  margin-bottom: 18px;
+}
+.filters-wrap .filter-bar {
+  margin-bottom: 0;
+}
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+}
+.active-filters-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+.active-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+}
+.active-chip:hover {
+  background: var(--primary-deep);
+}
+.active-chip-x {
+  font-size: 11px;
+  opacity: 0.9;
+}
+.empty-hints {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.empty-hint {
+  border: 1.5px solid var(--accent);
+  background: #eef7fc;
+  color: var(--accent-deep);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+}
+.empty-hint:hover {
+  background: var(--accent);
+  color: white;
+}
 
 /* ---------- Event grid ---------- */
 .grid {

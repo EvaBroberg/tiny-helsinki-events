@@ -75,11 +75,24 @@ function Dropdown<T extends string>({ label, items, selected, onToggle }: Dropdo
   );
 }
 
+type Group = 'cities' | 'ages' | 'prices' | 'settings';
+
 export function Filters({ filters, onChange }: Props): React.JSX.Element {
   const activeCount =
     filters.cities.length + filters.ages.length + filters.prices.length + filters.settings.length;
 
+  const remove = (group: Group, value: string) =>
+    onChange({ ...filters, [group]: (filters[group] as string[]).filter((x) => x !== value) });
+
+  const active: { group: Group; value: string }[] = [
+    ...filters.cities.map((v) => ({ group: 'cities' as const, value: v })),
+    ...filters.ages.map((v) => ({ group: 'ages' as const, value: v })),
+    ...filters.prices.map((v) => ({ group: 'prices' as const, value: v })),
+    ...filters.settings.map((v) => ({ group: 'settings' as const, value: v })),
+  ];
+
   return (
+    <div className="filters-wrap">
     <div className="filter-bar">
       <span className="filter-bar-label">Filter</span>
 
@@ -113,10 +126,27 @@ export function Filters({ filters, onChange }: Props): React.JSX.Element {
           className="filter-clear"
           onClick={() => onChange({ cities: [], ages: [], prices: [], settings: [] })}
         >
-          ✕ Clear ({activeCount})
+          ✕ Clear all ({activeCount})
         </button>
       ) : (
         <span className="filter-bar-hint">Showing everything</span>
+      )}
+    </div>
+
+      {active.length > 0 && (
+        <div className="active-filters">
+          <span className="active-filters-label">Active:</span>
+          {active.map((a) => (
+            <button
+              key={`${a.group}:${a.value}`}
+              className="active-chip"
+              onClick={() => remove(a.group, a.value)}
+              title="Remove this filter"
+            >
+              {cap(a.value)} <span className="active-chip-x">✕</span>
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );
