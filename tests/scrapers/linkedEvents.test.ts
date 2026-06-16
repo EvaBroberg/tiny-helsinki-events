@@ -46,6 +46,17 @@ describe('linkedEventToInput (Linked Events fixture)', () => {
     expect(linkedEventToInput(fixture.data[2], opts)).toBeNull();
   });
 
+  it('drops adult/senior events (audience_min_age >= 13)', () => {
+    const adult = {
+      id: 'helsinki:adult',
+      name: { fi: 'Ikääntyneiden vertaistukiryhmä' },
+      start_time: '2026-06-17T07:00:00Z',
+      audience_min_age: 60,
+      audience_max_age: 100,
+    };
+    expect(linkedEventToInput(adult, opts)).toBeNull();
+  });
+
   it('the fixture events pass the kids-relevance filter', () => {
     const events = fixture.data
       .map((r) => linkedEventToInput(r, opts))

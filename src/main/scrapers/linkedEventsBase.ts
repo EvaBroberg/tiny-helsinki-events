@@ -123,6 +123,12 @@ export function linkedEventToInput(
   if (!title) return null;
   if (!raw.start_time) return null;
 
+  // The broad "families" audience keyword also catches adult/senior events
+  // (peer-support groups, adult reading circles…). Drop anything whose minimum
+  // audience age is past childhood — a kids/family app shouldn't list a 60+ or
+  // 16+ event.
+  if (typeof raw.audience_min_age === 'number' && raw.audience_min_age >= 13) return null;
+
   const startDate = isoToHelsinkiDate(raw.start_time);
   if (!startDate) return null;
   let startTime = isoToHelsinkiTime(raw.start_time);

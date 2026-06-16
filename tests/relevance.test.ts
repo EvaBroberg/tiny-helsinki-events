@@ -90,4 +90,15 @@ describe('ageBucketsForEvent', () => {
   it('returns no buckets when the age is unknown', () => {
     expect(ageBucketsForEvent(mk(null))).toEqual([]);
   });
+
+  it('puts an adult/senior range (60–100) only in 7+ — never in a kid bucket', () => {
+    const buckets = ageBucketsForEvent(mk('60–100 v'));
+    expect(buckets).toEqual(['7+']);
+    expect(buckets).not.toContain('3-6');
+    expect(buckets).not.toContain('0-1');
+  });
+
+  it('handles a 16–100 adult range without collapsing to min 0', () => {
+    expect(ageBucketsForEvent(mk('16–100 v'))).toEqual(['7+']);
+  });
 });

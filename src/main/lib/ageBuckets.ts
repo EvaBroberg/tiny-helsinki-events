@@ -25,7 +25,9 @@ const BUCKET_RANGES: BucketRange[] = [
 /** Parse "0–3 v", "3+ v", "–1 v", "5 v" into a numeric {min,max}. */
 export function parseAgeRange(text: string | null | undefined): { min: number; max: number } | null {
   if (!text) return null;
-  const nums = text.match(/\d{1,2}/g)?.map(Number) ?? [];
+  // \d{1,3} so three-digit ages like "100" parse correctly (\d{1,2} turned
+  // "60–100" into [60,10,0] → min 0 → matched every bucket).
+  const nums = text.match(/\d{1,3}/g)?.map(Number) ?? [];
   if (!nums.length) return null;
   const hasPlus = /\+/.test(text);
   const startsOpen = /^\s*[–\-—]/.test(text); // "–1 v" means up to 1, i.e. from 0
