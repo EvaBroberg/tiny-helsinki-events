@@ -26,7 +26,7 @@ The primary source is the **Helsinki Region Linked Events open API** (`api.hel.f
 | Helsinki – Tapahtumat | **live** | Linked Events, `division=kunta:helsinki`, child/family **audience** filter |
 | Espoo – Tapahtumat | **live** | Linked Events, `division=kunta:espoo` |
 | Vantaa – Tapahtumat | **live** | Linked Events, `division=kunta:vantaa` |
-| Sipoo | **fixture / mock** | Sipoo is empty in Linked Events — see [Known limitations](#-known-limitations). Clearly badged "fixture/mock" in the UI. |
+| Sipoo – Tapahtumat | **live (usually empty)** | Linked Events, `division=kunta:sipoo`. Sipoo currently publishes ~no events, so this source is normally empty — see [Known limitations](#-known-limitations). |
 
 Each city scraper filters by the Linked Events **`audience`** parameter (`yso:p4354` children + `yso:p13050` families) rather than a topic keyword. Audience = "who the event is for", which captures library storytimes, museum & culture-centre workshops (Oodi, Annantalo, EMMA, Kiasma…), mall/family events (Iso Omena) and baby/toddler meetups that don't carry a "lapset" topic keyword. These sources are `preFiltered`, so the orchestrator trusts the audience filter instead of re-applying its keyword-relevance check.
 
@@ -155,7 +155,7 @@ tests/                     # vitest + fixtures
 
 ## ⚠️ Known limitations
 
-- **Sipoo is mock data.** Sipoo (Sibbo) is currently sparse in the Linked Events API and `sipoo.fi` has no clean event feed, so the Sipoo tab is populated from a fixture (`src/main/scrapers/fixtures/sipoo.sample.json`) and badged **fixture/mock**. See the `TODO` in `src/main/scrapers/sipoo.ts`.
+- **Sipoo is usually empty.** Sipoo (Sibbo) currently publishes ~no events to the Linked Events API, and `sipoo.fi` has no clean event feed, so the Sipoo tab is normally empty. We show **real data only** — no invented placeholder events. If Sipoo starts publishing (or a dedicated `sipoo.fi` scraper is added), events appear automatically.
 - **Children keyword.** Live sources query the Linked Events children keyword (`yso:p4354`). Some family events not tagged with it may be missed; the relevance filter is the safety net. More YSO keywords can be added in `linkedEventsBase.ts`.
 - **City coverage.** Espoo/Vantaa coverage depends on those cities publishing into the Helsinki Linked Events instance (verified working at build time, but volume varies).
 - **Ongoing exhibitions** with very long end dates can appear in "this week"; they are genuine dated events so they are kept.
