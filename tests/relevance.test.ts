@@ -22,6 +22,14 @@ describe('isDesignedForKids', () => {
   it('drops adult-min-age events', () => {
     expect(isDesignedForKids({ text: 'Lukupiiri', minAge: 16, maxAge: 100 })).toBe(false);
   });
+  it('treats a 0–0 age (placeholder) as no kid signal', () => {
+    expect(
+      isDesignedForKids({ text: 'Yrityksen perustaminen Suomessa - video', minAge: 0, maxAge: 0 }),
+    ).toBe(false);
+  });
+  it('still keeps a genuine baby event with max age 1', () => {
+    expect(isDesignedForKids({ text: 'Aamu', minAge: 0, maxAge: 1 })).toBe(true);
+  });
   it('keeps a family event even if an adult word appears alongside a kid word', () => {
     expect(isDesignedForKids({ text: 'Perheiden vesijumppa', maxAge: null })).toBe(true);
   });

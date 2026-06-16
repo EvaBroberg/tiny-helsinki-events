@@ -169,7 +169,9 @@ export function isDesignedForKids(input: {
 
   if (hasAdult && !hasKid) return false;
   // A specific upper age bound within childhood is a strong "for kids" signal.
-  if (maxAge !== null && maxAge <= 12) return true;
+  // Require maxAge >= 1: a max of 0 is a placeholder for "unset" (e.g. a "0–0"
+  // adult business video), not a genuine "up to age 0" event.
+  if (maxAge !== null && maxAge >= 1 && maxAge <= 12) return true;
   if (hasKid) return true;
   // Generic all-ages event with no kid signal → not designed for kids.
   return false;
