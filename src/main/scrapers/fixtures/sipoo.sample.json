@@ -1,0 +1,42 @@
+{
+  "source": "Sipoo municipality + Sipoo libraries (sample/mock data)",
+  "note": "Sipoo (Sibbo) is small and currently sparse in the Linked Events open API. Until a dedicated Sipoo scraper is implemented (see TODO in sipoo.ts), this fixture provides representative sample events so the Sipoo tab is never empty. Events are anchored to the current date via dayOffset so they always fall in the next-7-days window. They are clearly labelled as fixture/mock in the UI.",
+  "events": [
+    {
+      "title": "Satutuokio Nikkilän kirjastossa",
+      "description": "Lasten satuhetki ja askartelua. Storytime and crafts for children at Nikkilä library.",
+      "dayOffset": 0,
+      "startTime": "10:00",
+      "location": "Nikkilän kirjasto, Sipoo",
+      "ageRange": "2–6 v",
+      "priceText": "Ilmainen",
+      "isFree": true,
+      "eventUrl": "https://www.sipoo.fi/tapahtumat/",
+      "rawDateExample": "ke 17.6.2026 klo 10.00"
+    },
+    {
+      "title": "Perheiden puuhapäivä Söderkullassa",
+      "description": "Koko perheen ulkoilupäivä, leikkejä ja musiikkia puistossa. Family outdoor play day with games and music in the park.",
+      "dayOffset": 1,
+      "startTime": "13:00",
+      "location": "Söderkullan puisto, Sipoo",
+      "ageRange": "0–12 v",
+      "priceText": "Vapaa pääsy",
+      "isFree": true,
+      "eventUrl": "https://www.sipoo.fi/tapahtumat/",
+      "rawDateExample": "to 18.6.2026 klo 13.00"
+    },
+    {
+      "title": "Nukketeatteri: Pikku Myyrä",
+      "description": "Lasten nukketeatteriesitys. Puppet theatre show for toddlers and preschoolers.",
+      "dayOffset": 3,
+      "startTime": "11:00",
+      "location": "Sipoon kulttuuritalo",
+      "ageRange": "3–7 v",
+      "priceText": "8 €",
+      "isFree": false,
+      "eventUrl": "https://www.sipoo.fi/tapahtumat/",
+      "rawDateExample": "la 20.6.2026 klo 11.00"
+    }
+  ]
+}
