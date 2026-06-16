@@ -4,7 +4,6 @@ import { tabsForEvent, helsinkiToday } from '../main/lib/eventWindow.js';
 import { ageBucketsForEvent } from '../main/lib/relevance.js';
 import { EventCard } from '../renderer/components/EventCard.js';
 import { Filters } from '../renderer/components/Filters.js';
-import { DebugPanel } from '../renderer/components/DebugPanel.js';
 import { formatLastUpdated } from '../renderer/format.js';
 import { fetchFreshEvents, loadCached } from './scrape.js';
 
@@ -159,8 +158,6 @@ export function App(): React.JSX.Element {
           )}
         </div>
       )}
-
-      <DebugPanel logs={data.logs} />
     </div>
   );
 }

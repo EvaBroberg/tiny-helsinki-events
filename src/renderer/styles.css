@@ -1,18 +1,20 @@
 :root {
-  --bg: #fff7fb;
-  --bg-grad-1: #ffeef6;
-  --bg-grad-2: #eef4ff;
-  --ink: #4a3f55;
-  --ink-soft: #8a7f95;
+  /* Sunny yellow + teal "childcare" palette on a warm cream background. */
+  --bg: #fffaf0;
+  --bg-grad-1: #fff6e2;
+  --bg-grad-2: #eafaf5;
+  --ink: #2b3440;
+  --ink-soft: #79838f;
   --card: #ffffff;
-  --primary: #ff8fb1;
-  --primary-deep: #ff5d92;
-  --accent: #8ecae6;
-  --accent-deep: #4ea8de;
-  --mint: #b8e6c8;
+  --primary: #fbc53d; /* sunny yellow */
+  --primary-soft: #ffe6a0;
+  --primary-deep: #e0930a; /* amber, for text/contrast on light */
+  --accent: #2fb3a3; /* teal-green action colour */
+  --accent-deep: #1f8e80;
+  --mint: #cdeee6;
   --sun: #ffd97d;
-  --shadow: 0 8px 24px rgba(151, 117, 170, 0.15);
-  --radius: 18px;
+  --shadow: 0 10px 26px rgba(72, 99, 95, 0.12);
+  --radius: 22px;
 }
 
 * {
@@ -23,8 +25,19 @@ body {
   margin: 0;
   font-family: 'Nunito', 'Quicksand', 'Segoe UI', system-ui, -apple-system, sans-serif;
   color: var(--ink);
-  background: linear-gradient(135deg, var(--bg-grad-1), var(--bg-grad-2));
+  background: var(--bg);
+  background-image: radial-gradient(1200px 500px at 80% -10%, var(--bg-grad-2), transparent),
+    radial-gradient(1000px 460px at -10% -5%, var(--bg-grad-1), transparent);
   background-attachment: fixed;
+}
+
+h1,
+h2,
+h3,
+.card-title,
+.tab,
+.btn {
+  font-family: 'Fredoka', 'Nunito', 'Quicksand', system-ui, sans-serif;
 }
 
 #root {
@@ -37,27 +50,33 @@ body {
   padding: 20px 22px 60px;
 }
 
-/* ---------- Header ---------- */
+/* ---------- Header (sunny hero panel) ---------- */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 14px;
+  margin-bottom: 22px;
+  background: linear-gradient(135deg, var(--primary) 0%, #ffd766 100%);
+  border-radius: 28px;
+  padding: 22px 26px;
+  box-shadow: 0 14px 30px rgba(224, 147, 10, 0.18);
 }
 .header h1 {
-  font-size: 30px;
+  font-size: 32px;
   margin: 0;
   letter-spacing: -0.5px;
+  color: #4a3500;
 }
 .header .wave {
   font-size: 30px;
 }
 .subtitle {
-  color: var(--ink-soft);
-  margin: 2px 0 0;
-  font-size: 14px;
+  color: #6b5113;
+  margin: 4px 0 0;
+  font-size: 14.5px;
+  font-weight: 700;
 }
 .header-right {
   display: flex;
@@ -66,8 +85,9 @@ body {
 }
 .last-updated {
   font-size: 12.5px;
-  color: var(--ink-soft);
+  color: #6b5113;
   text-align: right;
+  font-weight: 700;
 }
 
 .btn {
@@ -84,9 +104,9 @@ body {
   transform: scale(0.96);
 }
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary), var(--primary-deep));
+  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
   color: white;
-  box-shadow: 0 6px 16px rgba(255, 93, 146, 0.35);
+  box-shadow: 0 6px 16px rgba(31, 142, 128, 0.3);
 }
 .btn-primary:disabled {
   opacity: 0.6;
@@ -124,7 +144,7 @@ body {
 .tab.active {
   background: linear-gradient(135deg, var(--accent), var(--accent-deep));
   color: white;
-  box-shadow: 0 6px 14px rgba(78, 168, 222, 0.3);
+  box-shadow: 0 6px 14px rgba(31, 142, 128, 0.28);
 }
 
 /* ---------- Filter bar (compact dropdowns) ---------- */
@@ -169,11 +189,11 @@ body {
 }
 .dd-btn.active {
   border-color: var(--primary);
-  background: #fff2f7;
+  background: #fff6e0;
   color: var(--primary-deep);
 }
 .dd-badge {
-  background: var(--primary);
+  background: var(--accent);
   color: white;
   font-size: 11px;
   font-weight: 900;
@@ -238,8 +258,8 @@ body {
   flex-shrink: 0;
 }
 .dd-box.on {
-  background: var(--primary-deep);
-  border-color: var(--primary-deep);
+  background: var(--accent);
+  border-color: var(--accent);
 }
 .filter-clear {
   border: none;
@@ -277,7 +297,7 @@ body {
   align-items: center;
   gap: 6px;
   border: none;
-  background: var(--primary);
+  background: var(--accent);
   color: white;
   border-radius: 999px;
   padding: 5px 12px;
@@ -287,7 +307,7 @@ body {
   cursor: pointer;
 }
 .active-chip:hover {
-  background: var(--primary-deep);
+  background: var(--accent-deep);
 }
 .active-chip-x {
   font-size: 11px;
@@ -347,7 +367,7 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 44px;
-  background: linear-gradient(135deg, #ffe3ef, #e3edff);
+  background: linear-gradient(135deg, #fff0c2, var(--mint));
 }
 .card-body {
   padding: 14px 16px 16px;
@@ -466,9 +486,13 @@ body {
   color: white;
   font-weight: 800;
   font-size: 13px;
-  padding: 7px 14px;
+  padding: 7px 16px;
   border-radius: 999px;
   white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(31, 142, 128, 0.25);
+}
+.link-btn:hover {
+  filter: brightness(1.05);
 }
 
 .more-bar {

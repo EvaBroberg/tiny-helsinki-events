@@ -4,7 +4,6 @@ import { tabsForEvent, helsinkiToday } from '../main/lib/eventWindow.js';
 import { ageBucketsForEvent } from '../main/lib/relevance.js';
 import { EventCard } from './components/EventCard.js';
 import { Filters } from './components/Filters.js';
-import { DebugPanel } from './components/DebugPanel.js';
 import { formatLastUpdated } from './format.js';
 
 const TABS: { key: TabKey; label: string; emoji: string }[] = [
@@ -167,8 +166,6 @@ export function App(): React.JSX.Element {
           )}
         </div>
       )}
-
-      <DebugPanel logs={data.logs} />
     </div>
   );
 }
