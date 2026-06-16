@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { AgeBucket, EventFilters, Price } from '@shared/types';
 import { CITIES } from '@shared/types';
 
-const AGES: AgeBucket[] = ['baby', 'toddler', 'preschool', 'school-age', 'family'];
+const AGES: AgeBucket[] = ['0-1', '1-3', '3-6', '7+'];
 const PRICES: Price[] = ['free', 'paid', 'unknown'];
 const SETTINGS: ('indoor' | 'outdoor')[] = ['indoor', 'outdoor'];
 
@@ -44,7 +44,7 @@ function Dropdown<T extends string>({ label, items, selected, onToggle }: Dropdo
     };
   }, [open]);
 
-  const count = selected.length;
+  const count = new Set(selected).size;
 
   return (
     <div className="dd" ref={ref}>
@@ -59,16 +59,22 @@ function Dropdown<T extends string>({ label, items, selected, onToggle }: Dropdo
       </button>
       {open && (
         <div className="dd-panel">
-          {items.map((it) => (
-            <label key={it} className={`dd-item ${selected.includes(it) ? 'sel' : ''}`}>
-              <input
-                type="checkbox"
-                checked={selected.includes(it)}
-                onChange={() => onToggle(it)}
-              />
-              <span>{cap(it)}</span>
-            </label>
-          ))}
+          {items.map((it) => {
+            const on = selected.includes(it);
+            return (
+              <button
+                key={it}
+                type="button"
+                className={`dd-item ${on ? 'sel' : ''}`}
+                onClick={() => onToggle(it)}
+                role="checkbox"
+                aria-checked={on}
+              >
+                <span className={`dd-box ${on ? 'on' : ''}`}>{on ? '✓' : ''}</span>
+                <span>{cap(it)}</span>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
@@ -79,7 +85,10 @@ type Group = 'cities' | 'ages' | 'prices' | 'settings';
 
 export function Filters({ filters, onChange }: Props): React.JSX.Element {
   const activeCount =
-    filters.cities.length + filters.ages.length + filters.prices.length + filters.settings.length;
+    new Set(filters.cities).size +
+    new Set(filters.ages).size +
+    new Set(filters.prices).size +
+    new Set(filters.settings).size;
 
   const remove = (group: Group, value: string) =>
     onChange({ ...filters, [group]: (filters[group] as string[]).filter((x) => x !== value) });

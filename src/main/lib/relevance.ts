@@ -88,19 +88,12 @@ export function eventIsRelevant(event: KidEvent): boolean {
   return isRelevantForKids({ text, hasKidsTag });
 }
 
-/** Map an event's tags + age range to coarse age buckets for filtering. */
+/**
+ * Map an event's age range to numeric age buckets for filtering. Returns [] when
+ * the event has no stated age range (it then only shows when no age filter is
+ * applied).
+ */
 export function ageBucketsForEvent(event: KidEvent): AgeBucket[] {
-  const buckets = new Set<AgeBucket>();
-  for (const t of event.tags) {
-    if (t === 'baby') buckets.add('baby');
-    if (t === 'toddler') buckets.add('toddler');
-    if (t === 'preschool') buckets.add('preschool');
-    if (t === 'school-age') buckets.add('school-age');
-    if (t === 'family' || t === 'kids') buckets.add('family');
-  }
-  // Add buckets that actually overlap the numeric age range.
   const range = parseAgeRange(event.ageRange);
-  if (range) bucketsForRange(range.min, range.max).forEach((b) => buckets.add(b));
-  if (buckets.size === 0) buckets.add('family');
-  return [...buckets];
+  return range ? bucketsForRange(range.min, range.max) : [];
 }

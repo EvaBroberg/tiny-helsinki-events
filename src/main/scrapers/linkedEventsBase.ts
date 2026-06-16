@@ -15,7 +15,10 @@ import { addDays } from '../lib/eventWindow.js';
 import type { Scraper, ScrapeContext } from './types.js';
 
 const API_BASE = 'https://api.hel.fi/linkedevents/v1/event/';
-const CHILDREN_KEYWORD = 'yso:p4354'; // "lapset" (children) — verified to return kids events.
+// Audience keywords: yso:p4354 = lapset (children), yso:p13050 = perheet (families).
+// Filtering by audience (who the event is FOR) gives far better coverage of
+// library/museum/culture-centre/family events than the topic keyword did.
+const CHILD_FAMILY_AUDIENCE = 'yso:p4354,yso:p13050';
 const SOURCE_URL = 'https://linkedevents.hel.fi/';
 
 // ---- Linked Events response shapes (only the fields we use) ----
@@ -212,10 +215,14 @@ export function makeLinkedEventsScraper(config: LinkedEventsScraperConfig): Scra
   return {
     name: config.name,
     isMock: false,
+    preFiltered: true, // audience filter already restricts to children/family events
     async scrape(ctx: ScrapeContext): Promise<KidEvent[]> {
       const end = addDays(ctx.todayISO, ctx.windowDays);
       const params = new URLSearchParams({
-        keyword: CHILDREN_KEYWORD,
+        // Filter by AUDIENCE (who the event is for) rather than topic keyword.
+        // This captures library storytimes, museum & culture-centre workshops,
+        // mall/family events etc. that don't carry the "lapset" topic keyword.
+        audience: CHILD_FAMILY_AUDIENCE,
         start: ctx.todayISO,
         end,
         sort: 'start_time',
@@ -225,15 +232,27 @@ export function makeLinkedEventsScraper(config: LinkedEventsScraperConfig): Scra
       });
       if (config.divisionKunta) params.set('division', `kunta:${config.divisionKunta}`);
 
+      const PAGE_SIZE = 100;
+      const MAX_PAGES = 20; // safety cap (~2000 events/source)
+      const pageUrl = (page: number) => {
+        const p = new URLSearchParams(params);
+        p.set('page_size', String(PAGE_SIZE));
+        p.set('page', String(page));
+        return `${API_BASE}?${p.toString()}`;
+      };
+
+      // Fetch page 1 to learn the total count, then fetch the rest IN PARALLEL
+      // (sequential paging of ~1000+ events was the main load-time bottleneck).
+      const first = await fetchJson(pageUrl(1));
+      const count = first.meta?.count ?? first.data?.length ?? 0;
+      const totalPages = Math.min(Math.ceil(count / PAGE_SIZE), MAX_PAGES);
+      const rest = await Promise.all(
+        Array.from({ length: Math.max(0, totalPages - 1) }, (_, i) => fetchJson(pageUrl(i + 2))),
+      );
+
       const scrapedAt = new Date().toISOString();
       const out: KidEvent[] = [];
-      let url: string | null = `${API_BASE}?${params.toString()}`;
-      let page = 0;
-      const MAX_PAGES = 3;
-
-      while (url && page < MAX_PAGES) {
-        page += 1;
-        const resp: LeResponse = await fetchJson(url);
+      for (const resp of [first, ...rest]) {
         for (const raw of resp.data ?? []) {
           const input = linkedEventToInput(raw, {
             fallbackCity: config.fallbackCity,
@@ -245,10 +264,9 @@ export function makeLinkedEventsScraper(config: LinkedEventsScraperConfig): Scra
           if (config.keep && !config.keep(ev)) continue;
           out.push(ev);
         }
-        url = resp.meta?.next ?? null;
       }
 
-      ctx.logger.info(`${config.name}: fetched ${out.length} normalized events across ${page} page(s)`);
+      ctx.logger.info(`${config.name}: fetched ${out.length} normalized events across ${totalPages} page(s)`);
       return out;
     },
   };

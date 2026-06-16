@@ -44,7 +44,11 @@ async function runOne(
     rawCount = raw.length;
     kept = raw.filter(
       (ev) =>
-        !isOld(ev, todayISO) && isActiveWithin(ev, todayISO, windowDays) && eventIsRelevant(ev),
+        !isOld(ev, todayISO) &&
+        isActiveWithin(ev, todayISO, windowDays) &&
+        // Sources that already filter by child/family audience are trusted;
+        // others must pass our keyword-relevance check.
+        (scraper.preFiltered || eventIsRelevant(ev)),
     );
     log.info(`source "${scraper.name}": raw=${rawCount}, kept after filtering=${kept.length}`);
   } catch (err) {

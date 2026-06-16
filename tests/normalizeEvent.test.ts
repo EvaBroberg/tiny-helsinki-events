@@ -47,25 +47,6 @@ describe('normalizeEvent', () => {
     expect(ev.description).toBe('Hei maailma');
   });
 
-  it('produces age tags from an age range', () => {
-    const ev = normalizeEvent({ ...base, ageRange: '0–3 v' });
-    expect(ev.tags).toContain('baby');
-    expect(ev.tags).toContain('toddler');
-  });
-
-  it('does NOT over-tag a baby-only (0–1) event as toddler/preschool', () => {
-    const ev = normalizeEvent({ ...base, title: 'Baby morning', description: 'vauvoille', ageRange: '–1 v' });
-    expect(ev.tags).toContain('baby');
-    expect(ev.tags).not.toContain('toddler');
-    expect(ev.tags).not.toContain('preschool');
-    expect(ev.tags).not.toContain('school-age');
-  });
-
-  it('tags a wide 1–7 range across all overlapping buckets', () => {
-    const ev = normalizeEvent({ ...base, ageRange: '1–7 v' });
-    expect(ev.tags).toEqual(expect.arrayContaining(['baby', 'toddler', 'preschool', 'school-age']));
-  });
-
   it('gives the same content hash for equivalent events and id === hash', () => {
     const a = normalizeEvent(base);
     const b = normalizeEvent({ ...base, sourceName: 'Other source' });

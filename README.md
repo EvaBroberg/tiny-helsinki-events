@@ -23,12 +23,12 @@ The primary source is the **Helsinki Region Linked Events open API** (`api.hel.f
 
 | Source | Type | Notes |
 | --- | --- | --- |
-| Helsinki – Tapahtumat | **live** | Linked Events, `division=kunta:helsinki`, children keyword |
+| Helsinki – Tapahtumat | **live** | Linked Events, `division=kunta:helsinki`, child/family **audience** filter |
 | Espoo – Tapahtumat | **live** | Linked Events, `division=kunta:espoo` |
 | Vantaa – Tapahtumat | **live** | Linked Events, `division=kunta:vantaa` |
-| Kirjastot / Libraries | **live** | Region-wide, filtered to library programming |
-| Museot & lastenkulttuuri | **live** | Region-wide, filtered to museums / culture centres |
-| Sipoo | **fixture / mock** | Sipoo is sparse in Linked Events — see [Known limitations](#-known-limitations). Clearly badged "fixture/mock" in the UI. |
+| Sipoo | **fixture / mock** | Sipoo is empty in Linked Events — see [Known limitations](#-known-limitations). Clearly badged "fixture/mock" in the UI. |
+
+Each city scraper filters by the Linked Events **`audience`** parameter (`yso:p4354` children + `yso:p13050` families) rather than a topic keyword. Audience = "who the event is for", which captures library storytimes, museum & culture-centre workshops (Oodi, Annantalo, EMMA, Kiasma…), mall/family events (Iso Omena) and baby/toddler meetups that don't carry a "lapset" topic keyword. These sources are `preFiltered`, so the orchestrator trusts the audience filter instead of re-applying its keyword-relevance check.
 
 > Per the brief: each source has its own scraper file; they all funnel through a shared `normalizeEvent()`, shared dedupe, shared date parser, and shared logging. Real page structure was inspected before wiring selectors (the Linked Events JSON schema was verified live). Where a real feed is unavailable (Sipoo), a clearly-labelled fixture scraper with sample data is used instead.
 

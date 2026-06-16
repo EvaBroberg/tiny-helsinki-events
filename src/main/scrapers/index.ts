@@ -13,17 +13,8 @@ import { helsinkiScraper } from './helsinki.js';
 import { espooScraper } from './espoo.js';
 import { vantaaScraper } from './vantaa.js';
 import { sipooScraper } from './sipoo.js';
-import { librariesScraper } from './libraries.js';
-import { museumsScraper } from './museums.js';
 
-export const SCRAPERS: Scraper[] = [
-  helsinkiScraper,
-  espooScraper,
-  vantaaScraper,
-  librariesScraper,
-  museumsScraper,
-  sipooScraper,
-];
+export const SCRAPERS: Scraper[] = [helsinkiScraper, espooScraper, vantaaScraper, sipooScraper];
 
 export type { OrchestratorResult, RunOptions };
 

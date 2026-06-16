@@ -76,6 +76,9 @@ export function App(): React.JSX.Element {
   }, [data.events, filters, today]);
 
   const visible = byTab[tab];
+  const [showAll, setShowAll] = useState(false);
+  const LIMIT = 120;
+  const shown = showAll ? visible : visible.slice(0, LIMIT);
   const activeFilterCount =
     filters.cities.length + filters.ages.length + filters.prices.length + filters.settings.length;
   const otherTabsWithMatches = TABS.filter((t) => t.key !== tab && byTab[t.key].length > 0);
@@ -119,11 +122,21 @@ export function App(): React.JSX.Element {
       <Filters filters={filters} onChange={setFilters} />
 
       {visible.length > 0 ? (
-        <div className="grid">
-          {visible.map((ev) => (
-            <EventCard key={ev.id} event={ev} />
-          ))}
-        </div>
+        <>
+          <div className="grid">
+            {shown.map((ev) => (
+              <EventCard key={ev.id} event={ev} />
+            ))}
+          </div>
+          {visible.length > shown.length && (
+            <div className="more-bar">
+              Showing {shown.length} of {visible.length}. Narrow with filters, or{' '}
+              <button className="more-btn" onClick={() => setShowAll(true)}>
+                show all {visible.length}
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         <div className="empty">
           <div className="big">{loading ? '🔄' : '🦋'}</div>

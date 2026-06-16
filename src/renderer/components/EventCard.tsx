@@ -21,6 +21,10 @@ const TAG_EMOJI: Record<string, string> = {
   library: '📚',
 };
 
+// Age/kind words are conveyed by the 🎂 age range + emoji, so don't repeat them
+// as coloured chips (keeps cards clean and consistent with the numeric filters).
+const HIDDEN_TAGS = new Set(['baby', 'toddler', 'preschool', 'school-age', 'family', 'kids']);
+
 function cardEmoji(event: KidEvent): string {
   for (const t of ['theatre', 'music', 'workshop', 'exhibition', 'storytime', 'outdoor']) {
     if (event.tags.includes(t as never)) return TAG_EMOJI[t];
@@ -48,11 +52,14 @@ export function EventCard({ event }: { event: KidEvent }): React.JSX.Element {
         </div>
         {event.description && <p className="card-desc">{event.description}</p>}
         <div className="tag-row">
-          {event.tags.slice(0, 6).map((t) => (
-            <span key={t} className={`tag ${t}`}>
-              {TAG_EMOJI[t] ?? ''} {t}
-            </span>
-          ))}
+          {event.tags
+            .filter((t) => !HIDDEN_TAGS.has(t))
+            .slice(0, 6)
+            .map((t) => (
+              <span key={t} className={`tag ${t}`}>
+                {TAG_EMOJI[t] ?? ''} {t}
+              </span>
+            ))}
         </div>
         <div className="card-footer">
           <span className="source">via {event.sourceName}</span>

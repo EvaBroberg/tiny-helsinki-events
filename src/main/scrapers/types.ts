@@ -20,6 +20,13 @@ export interface Scraper {
   /** true when this scraper returns fixture/mock data instead of live data. */
   isMock: boolean;
   /**
+   * true when the source already restricts to children/family events (e.g. via
+   * the Linked Events `audience` filter), so the orchestrator should NOT apply
+   * its own keyword-relevance filter (which would drop kid events that don't
+   * happen to contain a keyword in their title/description).
+   */
+  preFiltered?: boolean;
+  /**
    * Fetch + normalize events. Returns normalized KidEvents WITHOUT relevance /
    * window filtering or dedup — the orchestrator applies those across all
    * sources. May throw; the orchestrator catches and records the error.

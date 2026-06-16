@@ -9,18 +9,9 @@ import { runScrapers } from '../main/scrapers/runner.js';
 import { helsinkiScraper } from '../main/scrapers/helsinki.js';
 import { espooScraper } from '../main/scrapers/espoo.js';
 import { vantaaScraper } from '../main/scrapers/vantaa.js';
-import { librariesScraper } from '../main/scrapers/libraries.js';
-import { museumsScraper } from '../main/scrapers/museums.js';
 import { sipooWebScraper } from './sipooWeb.js';
 
-const WEB_SCRAPERS = [
-  helsinkiScraper,
-  espooScraper,
-  vantaaScraper,
-  librariesScraper,
-  museumsScraper,
-  sipooWebScraper,
-];
+const WEB_SCRAPERS = [helsinkiScraper, espooScraper, vantaaScraper, sipooWebScraper];
 
 const CACHE_KEY = 'tiny-helsinki-events:cache:v1';
 

@@ -12,13 +12,14 @@ interface BucketRange {
   hi: number;
 }
 
-// Approximate Finnish age brackets. Slight gaps (e.g. 1↔2) keep the buckets
-// from over-overlapping; the goal is "preschool means ~preschool-aged".
+// Numeric age brackets shown to the user. Ranges are inclusive and may share a
+// boundary (a 1-year-old fits both "0-1" and "1-3"), but non-adjacent buckets
+// never overlap (a 0-1 event is never "3-6" or "7+").
 const BUCKET_RANGES: BucketRange[] = [
-  { bucket: 'baby', lo: 0, hi: 1 },
-  { bucket: 'toddler', lo: 2, hi: 3 },
-  { bucket: 'preschool', lo: 4, hi: 6 },
-  { bucket: 'school-age', lo: 7, hi: 15 },
+  { bucket: '0-1', lo: 0, hi: 1 },
+  { bucket: '1-3', lo: 1, hi: 3 },
+  { bucket: '3-6', lo: 3, hi: 6 },
+  { bucket: '7+', lo: 7, hi: 99 },
 ];
 
 /** Parse "0–3 v", "3+ v", "–1 v", "5 v" into a numeric {min,max}. */

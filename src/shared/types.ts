@@ -8,7 +8,8 @@ export const CITIES: City[] = ['Helsinki', 'Espoo', 'Vantaa', 'Sipoo'];
 
 export type Price = 'free' | 'paid' | 'unknown';
 
-export type AgeBucket = 'baby' | 'toddler' | 'preschool' | 'school-age' | 'family';
+/** Age filter buckets, labelled as numeric ranges. */
+export type AgeBucket = '0-1' | '1-3' | '3-6' | '7+';
 
 /** Tags we attach to events for filtering / display. */
 export type Tag =

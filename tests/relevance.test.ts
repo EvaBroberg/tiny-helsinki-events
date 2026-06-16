@@ -58,48 +58,36 @@ describe('eventIsRelevant (full event)', () => {
 });
 
 describe('ageBucketsForEvent', () => {
-  it('maps an age range to buckets', () => {
-    const ev = normalizeEvent({
+  const mk = (ageRange: string | null) =>
+    normalizeEvent({
       title: 'Tapahtuma',
       description: 'lapsille',
-      ageRange: '0–3 v',
+      ageRange,
       startDate: '2026-06-17',
       city: 'Helsinki',
       sourceName: 'X',
       sourceUrl: 'https://x',
       eventUrl: 'https://x/e',
     });
-    const buckets = ageBucketsForEvent(ev);
-    expect(buckets).toContain('baby');
-    expect(buckets).toContain('toddler');
+
+  it('maps an age range to numeric buckets', () => {
+    expect(ageBucketsForEvent(mk('0–3 v'))).toEqual(expect.arrayContaining(['0-1', '1-3']));
   });
 
-  it('does not put a baby-only (0–1) event in the preschool bucket', () => {
-    const ev = normalizeEvent({
-      title: 'Baby morning',
-      description: 'vauvoille',
-      ageRange: '–1 v',
-      startDate: '2026-06-17',
-      city: 'Helsinki',
-      sourceName: 'X',
-      sourceUrl: 'https://x',
-      eventUrl: 'https://x/e',
-    });
-    const buckets = ageBucketsForEvent(ev);
-    expect(buckets).toContain('baby');
-    expect(buckets).not.toContain('preschool');
+  it('does not put a baby-only (0–1) event in the 3-6 or 7+ buckets', () => {
+    const buckets = ageBucketsForEvent(mk('–1 v'));
+    expect(buckets).toContain('0-1');
+    expect(buckets).not.toContain('3-6');
+    expect(buckets).not.toContain('7+');
   });
 
-  it('defaults to family when nothing else is known', () => {
-    const ev = normalizeEvent({
-      title: 'Perhetapahtuma',
-      description: 'perheille',
-      startDate: '2026-06-17',
-      city: 'Helsinki',
-      sourceName: 'X',
-      sourceUrl: 'https://x',
-      eventUrl: 'https://x/e',
-    });
-    expect(ageBucketsForEvent(ev)).toContain('family');
+  it('spans all buckets for a wide 0–99 range', () => {
+    expect(ageBucketsForEvent(mk('0–99 v'))).toEqual(
+      expect.arrayContaining(['0-1', '1-3', '3-6', '7+']),
+    );
+  });
+
+  it('returns no buckets when the age is unknown', () => {
+    expect(ageBucketsForEvent(mk(null))).toEqual([]);
   });
 });
