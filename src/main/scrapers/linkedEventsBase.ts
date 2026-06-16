@@ -66,6 +66,25 @@ function pickLang(s: LangString | string | undefined | null): string {
   return s.fi || s.en || s.sv || '';
 }
 
+/**
+ * Pick the best display string preferring ENGLISH (so English-speaking users can
+ * read events), falling back to Finnish then Swedish. Also reports which
+ * language was actually used, so the UI knows whether to offer translation.
+ */
+function pickDisplay(
+  ...sources: (LangString | undefined)[]
+): { text: string; lang: 'fi' | 'en' | 'sv' } {
+  for (const order of [['en', 'fi', 'sv'] as const]) {
+    for (const lang of order) {
+      for (const s of sources) {
+        const v = s?.[lang];
+        if (v && v.trim()) return { text: v, lang };
+      }
+    }
+  }
+  return { text: '', lang: 'fi' };
+}
+
 function mapCity(locality: string, fallback: City): City {
   const l = locality.toLowerCase();
   if (l.includes('helsinki') || l.includes('helsingfors')) return 'Helsinki';
@@ -97,7 +116,8 @@ export function linkedEventToInput(
   raw: LeEvent,
   opts: LinkedEventsTransformOpts,
 ): NormalizeInput | null {
-  const title = pickLang(raw.name).trim();
+  const titlePick = pickDisplay(raw.name);
+  const title = titlePick.text.trim();
   if (!title) return null;
   if (!raw.start_time) return null;
 
@@ -127,9 +147,16 @@ export function linkedEventToInput(
   const priceText = pickLang(offer?.price) || pickLang(offer?.description) || null;
 
   const keywordsText = (raw.keywords ?? []).map((k) => pickLang(k.name)).join(' ');
-  const description = pickLang(raw.short_description) || pickLang(raw.description);
+  const descPick = pickDisplay(raw.short_description, raw.description);
+  const description = descPick.text;
 
-  const eventUrl = pickLang(raw.info_url) || `https://linkedevents.hel.fi/fi/event/${raw.id}`;
+  // The event is "English" only if everything we show is English; otherwise we
+  // mark its source language so the UI can offer a translate button.
+  let lang: 'fi' | 'en' | 'sv' = 'en';
+  if (titlePick.lang !== 'en') lang = titlePick.lang;
+  else if (description && descPick.lang !== 'en') lang = descPick.lang;
+
+  const eventUrl = pickDisplay(raw.info_url).text || `https://linkedevents.hel.fi/fi/event/${raw.id}`;
 
   return {
     title,
@@ -149,6 +176,7 @@ export function linkedEventToInput(
     extraText: keywordsText,
     isMock: opts.isMock ?? false,
     scrapedAt: opts.scrapedAt,
+    lang,
   };
 }
 

@@ -58,6 +58,8 @@ export interface KidEvent {
   contentHash: string;
   /** true when the event comes from a fixture/mock scraper rather than live data. */
   isMock: boolean;
+  /** Language of the title/description as displayed (so the UI knows whether to offer translation). */
+  lang: 'fi' | 'en' | 'sv';
 }
 
 /** Result of a single scraper run, surfaced in the debug panel. */
@@ -81,10 +83,13 @@ export interface RefreshResult {
 
 export type TabKey = 'today' | 'tomorrow' | 'weekend' | 'week';
 
+/**
+ * All filter groups are multi-select toggles. An EMPTY array means "no filter"
+ * for that group, i.e. show everything — there is no explicit "all" option.
+ */
 export interface EventFilters {
   cities: City[];
   ages: AgeBucket[];
-  price: Price | 'all';
-  /** 'all' | 'indoor' | 'outdoor' */
-  setting: 'all' | 'indoor' | 'outdoor';
+  prices: Price[];
+  settings: ('indoor' | 'outdoor')[];
 }

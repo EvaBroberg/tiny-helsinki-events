@@ -42,6 +42,8 @@ export interface NormalizeInput {
   extraText?: string | null;
   isMock?: boolean;
   scrapedAt?: string;
+  /** Language of the title/description (defaults to 'fi'). */
+  lang?: 'fi' | 'en' | 'sv';
 }
 
 const FREE_PATTERNS = [/\bilmainen\b/i, /\bilmais/i, /\bmaksuton\b/i, /\bvapaa pääsy\b/i, /\bfree\b/i];
@@ -135,5 +137,6 @@ export function normalizeEvent(input: NormalizeInput): KidEvent {
     scrapedAt: input.scrapedAt ?? new Date().toISOString(),
     contentHash,
     isMock: input.isMock ?? false,
+    lang: input.lang ?? 'fi',
   };
 }

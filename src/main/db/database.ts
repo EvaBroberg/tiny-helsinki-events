@@ -36,7 +36,8 @@ function migrate(db: DB): void {
       imageUrl    TEXT,
       scrapedAt   TEXT NOT NULL,
       contentHash TEXT NOT NULL,
-      isMock      INTEGER NOT NULL
+      isMock      INTEGER NOT NULL,
+      lang        TEXT NOT NULL DEFAULT 'fi'
     );
     CREATE INDEX IF NOT EXISTS idx_events_startDate ON events(startDate);
     CREATE TABLE IF NOT EXISTS meta (
@@ -44,6 +45,12 @@ function migrate(db: DB): void {
       value TEXT NOT NULL
     );
   `);
+
+  // Migrate older databases that predate the `lang` column.
+  const cols = db.prepare(`PRAGMA table_info(events)`).all() as { name: string }[];
+  if (!cols.some((c) => c.name === 'lang')) {
+    db.exec(`ALTER TABLE events ADD COLUMN lang TEXT NOT NULL DEFAULT 'fi'`);
+  }
 }
 
 interface EventRow {
@@ -67,6 +74,7 @@ interface EventRow {
   scrapedAt: string;
   contentHash: string;
   isMock: number;
+  lang: string;
 }
 
 function rowToEvent(r: EventRow): KidEvent {
@@ -91,6 +99,7 @@ function rowToEvent(r: EventRow): KidEvent {
     scrapedAt: r.scrapedAt,
     contentHash: r.contentHash,
     isMock: r.isMock === 1,
+    lang: (r.lang as KidEvent['lang']) ?? 'fi',
   };
 }
 
@@ -100,11 +109,11 @@ export function replaceEvents(db: DB, events: KidEvent[]): void {
     INSERT INTO events (
       id, title, description, startDate, endDate, startTime, location, city,
       sourceName, sourceUrl, eventUrl, ageRange, priceText, price, tags, indoor,
-      imageUrl, scrapedAt, contentHash, isMock
+      imageUrl, scrapedAt, contentHash, isMock, lang
     ) VALUES (
       @id, @title, @description, @startDate, @endDate, @startTime, @location, @city,
       @sourceName, @sourceUrl, @eventUrl, @ageRange, @priceText, @price, @tags, @indoor,
-      @imageUrl, @scrapedAt, @contentHash, @isMock
+      @imageUrl, @scrapedAt, @contentHash, @isMock, @lang
     )
   `);
 

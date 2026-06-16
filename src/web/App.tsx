@@ -16,7 +16,7 @@ const TABS: { key: TabKey; label: string; emoji: string }[] = [
 ];
 
 const EMPTY: RefreshResult = { events: [], logs: [], lastUpdated: '' };
-const DEFAULT_FILTERS: EventFilters = { cities: [], ages: [], price: 'all', setting: 'all' };
+const DEFAULT_FILTERS: EventFilters = { cities: [], ages: [], prices: [], settings: [] };
 
 function matchesFilters(event: KidEvent, f: EventFilters): boolean {
   if (f.cities.length && !f.cities.includes(event.city)) return false;
@@ -24,9 +24,11 @@ function matchesFilters(event: KidEvent, f: EventFilters): boolean {
     const buckets = ageBucketsForEvent(event);
     if (!f.ages.some((a) => buckets.includes(a))) return false;
   }
-  if (f.price !== 'all' && event.price !== f.price) return false;
-  if (f.setting === 'indoor' && event.indoor !== true) return false;
-  if (f.setting === 'outdoor' && event.indoor !== false) return false;
+  if (f.prices.length && !f.prices.includes(event.price)) return false;
+  if (f.settings.length) {
+    const setting = event.indoor === true ? 'indoor' : event.indoor === false ? 'outdoor' : null;
+    if (!setting || !f.settings.includes(setting)) return false;
+  }
   return true;
 }
 

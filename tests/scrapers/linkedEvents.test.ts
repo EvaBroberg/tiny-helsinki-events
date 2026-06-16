@@ -15,12 +15,13 @@ const fixture = JSON.parse(
 const opts = { fallbackCity: 'Helsinki' as const, sourceName: 'Helsinki (test)' };
 
 describe('linkedEventToInput (Linked Events fixture)', () => {
-  it('transforms a complete event correctly', () => {
+  it('transforms a complete event correctly, preferring English text', () => {
     const input = linkedEventToInput(fixture.data[0], opts);
     expect(input).not.toBeNull();
     const ev = normalizeEvent(input!);
 
-    expect(ev.title).toBe('Satutuokio Oodissa');
+    expect(ev.title).toBe('Storytime at Oodi'); // English preferred over Finnish name
+    expect(ev.lang).toBe('en'); // title + description both English -> no translation needed
     expect(ev.startDate).toBe('2026-06-17');
     expect(ev.startTime).toBe('10:00'); // 07:00Z -> 10:00 Helsinki summer time
     expect(ev.city).toBe('Helsinki');
@@ -33,9 +34,10 @@ describe('linkedEventToInput (Linked Events fixture)', () => {
     expect(ev.description).not.toContain('<'); // HTML stripped
   });
 
-  it('parses a paid family workshop and detects the price', () => {
+  it('parses a paid family workshop, and marks it Finnish (no English available)', () => {
     const ev = normalizeEvent(linkedEventToInput(fixture.data[1], opts)!);
     expect(ev.title).toContain('taidetyöpaja');
+    expect(ev.lang).toBe('fi'); // only Finnish text -> UI offers translation
     expect(ev.price).toBe('paid');
     expect(ev.tags).toContain('workshop');
   });
