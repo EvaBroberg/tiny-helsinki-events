@@ -46,6 +46,17 @@ describe('linkedEventToInput (Linked Events fixture)', () => {
     expect(linkedEventToInput(fixture.data[2], opts)).toBeNull();
   });
 
+  it('falls back to the PUBLIC tapahtumat.hel.fi page (not the editor backend) when no info_url', () => {
+    const ev = {
+      id: 'helsinki:xyz789',
+      name: { fi: 'Satutuokio lapsille' },
+      start_time: '2026-06-17T07:00:00Z',
+      audience_max_age: 6,
+    };
+    const input = linkedEventToInput(ev, opts);
+    expect(input?.eventUrl).toBe('https://tapahtumat.hel.fi/fi/events/helsinki:xyz789');
+  });
+
   it('drops adult/senior events (audience_min_age >= 13)', () => {
     const adult = {
       id: 'helsinki:adult',

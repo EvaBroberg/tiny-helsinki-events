@@ -159,7 +159,10 @@ export function linkedEventToInput(
   if (titlePick.lang !== 'en') lang = titlePick.lang;
   else if (description && descPick.lang !== 'en') lang = descPick.lang;
 
-  const eventUrl = pickDisplay(raw.info_url).text || `https://linkedevents.hel.fi/fi/event/${raw.id}`;
+  // Prefer the organiser's own info URL; otherwise link to the PUBLIC event page
+  // on tapahtumat.hel.fi (NOT linkedevents.hel.fi, which is the editor backend).
+  const eventUrl =
+    pickDisplay(raw.info_url).text || `https://tapahtumat.hel.fi/fi/events/${raw.id}`;
 
   // Require a positive "designed for kids" signal — the family audience alone
   // sweeps in adult/senior activities that merely allow all ages (0–100).
